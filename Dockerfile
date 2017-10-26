@@ -10,11 +10,10 @@ RUN mkdir -p $APP_PATH \
  && npm install -g yarn \
  && apk add --virtual .sni-build-tools \
       alpine-sdk \
+      linux-headers
  && apk add --virtual .sni-postgres-dev \
-    postgresql-dev \
+      postgresql-dev \
  && apk add --virtual .sni-development-tools \
-      postgresql-client \
-      postgresql \
       ca-certificates \
       wget \
       bash \
@@ -24,6 +23,9 @@ RUN mkdir -p $APP_PATH \
       bc \
       coreutils \
       git \
+ && apk add postgresql \
+   && cp /usr/bin/psql /usr/bin/pg_dump /usr/bin/pg_dumpall /usr/bin/pg_restore /usr/local/bin/ \
+   && apk del postgresql \
  && rm -rf /var/cache/apk/*
 
 WORKDIR $APP_PATH
