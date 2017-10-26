@@ -10,7 +10,7 @@ RUN mkdir -p $APP_PATH \
  && npm install -g yarn \
  && apk add --virtual .sni-build-tools \
       alpine-sdk \
-      linux-headers
+      linux-headers \
  && apk add --virtual .sni-postgres-dev \
       postgresql-dev \
  && apk add --virtual .sni-development-tools \
