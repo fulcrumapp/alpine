@@ -1,13 +1,18 @@
+FROM mhart/alpine-node:8 AS alpine-node
+
 FROM ruby:2.4.2-alpine3.6
+
+COPY --from=alpine-node /usr/bin/node /usr/bin/
+COPY --from=alpine-node /usr/local/share/yarn /usr/local/share/yarn
+COPY --from=alpine-node /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
+COPY --from=alpine-node /usr/lib/node_modules /usr/lib/node_modules
 
 ENV APP_PATH /app
 
+ADD . /sni
+
 RUN mkdir -p $APP_PATH \
  && apk update \
- && apk add --virtual .sni-nodejs \
-      nodejs \
-      nodejs-npm \
- && npm install -g yarn \
  && apk add --virtual .sni-build-tools \
       alpine-sdk \
       linux-headers \
@@ -24,6 +29,7 @@ RUN mkdir -p $APP_PATH \
       coreutils \
       git \
       less \
+ && /sni/setup-node.sh \
  && apk add postgresql \
    && cp /usr/bin/psql /usr/bin/pg_dump /usr/bin/pg_dumpall /usr/bin/pg_restore /usr/local/bin/ \
    && apk del postgresql \
