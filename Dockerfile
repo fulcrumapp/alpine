@@ -1,6 +1,6 @@
 FROM mhart/alpine-node:8 AS alpine-node
 
-FROM ruby:2.4.2-alpine3.6
+FROM ruby:2.5-alpine
 
 COPY --from=alpine-node /usr/bin/node /usr/bin/
 COPY --from=alpine-node /usr/local/share/yarn /usr/local/share/yarn
