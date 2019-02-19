@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:11 as NODE
+FROM mhart/alpine-node:8 as NODE
 
 FROM ruby:2.4-alpine
 
