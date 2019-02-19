@@ -1,8 +1,24 @@
+FROM mhart/alpine-node:11 as NODE
+
 FROM ruby:2.4-alpine
 
 ENV APP_PATH /app
 
-RUN mkdir -p $APP_PATH \
+# Keep in sync with uninstall-node.sh
+COPY --from=NODE /usr/include/node /usr/include/node
+COPY --from=NODE /usr/lib/libgcc* /usr/lib/libstdc* /usr/lib/
+COPY --from=NODE /usr/lib/node_modules /usr/lib/node_modules
+COPY --from=NODE /usr/local/share/yarn /usr/local/share/yarn
+COPY --from=NODE /usr/bin/node /usr/bin/
+
+COPY uninstall-node.sh /usr/bin/uninstall-node
+
+RUN chmod +x /usr/bin/uninstall-node \
+ && ln -s /usr/lib/node_modules/npm/bin/npm-cli.js /usr/bin/npm \
+ && ln -s /usr/lib/node_modules/npm/bin/npx-cli.js /usr/bin/npx \
+ && ln -s /usr/local/share/yarn/bin/yarn /usr/local/bin/yarn \
+ && ln -s /usr/local/share/yarn/bin/yarnpkg /usr/local/bin/yarnpkg \
+ && mkdir -p $APP_PATH \
  && apk update \
  && apk add --virtual .sni-build-tools \
       alpine-sdk \
@@ -20,9 +36,6 @@ RUN mkdir -p $APP_PATH \
       coreutils \
       git \
       less \
- && apk add --virtual .sni-node \
-      nodejs \
-      yarn \
  && apk add postgresql \
    && cp /usr/bin/psql /usr/bin/pg_dump /usr/bin/pg_dumpall /usr/bin/pg_restore /usr/local/bin/ \
    && apk del postgresql \
@@ -30,4 +43,4 @@ RUN mkdir -p $APP_PATH \
 
 WORKDIR $APP_PATH
 
-CMD ['bash']
+CMD ["bash"]
