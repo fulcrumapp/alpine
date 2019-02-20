@@ -38,8 +38,6 @@ RUN chmod +x /usr/bin/uninstall-node \
       less \
       python \
  && apk add postgresql \
-   && cp /usr/bin/psql /usr/bin/pg_dump /usr/bin/pg_dumpall /usr/bin/pg_restore /usr/local/bin/ \
-   && apk del postgresql \
  && rm -rf /var/cache/apk/*
 
 WORKDIR $APP_PATH
