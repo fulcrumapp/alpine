@@ -3,6 +3,14 @@ FROM mhart/alpine-node:8 as NODE
 FROM ruby:2.4-alpine
 
 ENV APP_PATH /app
+ENV RUNIT_SERVICE_DIR /etc/service
+
+RUN addgroup -S -g 9999 apps \
+ && adduser -S -u 9999 -s /bin/sh -D -h /home/apps -G apps apps \
+ && mkdir -p ${APP_PATH} \
+ && mkdir -p ${RUNIT_SERVICE_DIR} \
+ && chown -R apps:apps ${APP_PATH} \
+ && chown -R apps:apps ${RUNIT_SERVICE_DIR}
 
 # Keep in sync with uninstall-node.sh
 COPY --from=NODE /usr/include/node /usr/include/node
@@ -18,7 +26,6 @@ RUN chmod +x /usr/bin/uninstall-node \
  && ln -s /usr/lib/node_modules/npm/bin/npx-cli.js /usr/bin/npx \
  && ln -s /usr/local/share/yarn/bin/yarn /usr/local/bin/yarn \
  && ln -s /usr/local/share/yarn/bin/yarnpkg /usr/local/bin/yarnpkg \
- && mkdir -p $APP_PATH \
  && apk update \
  && apk add --virtual .sni-build-tools \
       alpine-sdk \
@@ -37,7 +44,7 @@ RUN chmod +x /usr/bin/uninstall-node \
       git \
       less \
       python \
- && apk add postgresql \
+ && apk add postgresql runit \
  && rm -rf /var/cache/apk/*
 
 WORKDIR $APP_PATH
